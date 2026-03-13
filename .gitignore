@@ -4,7 +4,10 @@ refactor/
 # Actual configuration files (contain secrets)
 bot.env
 bot.yaml
+config.yaml
 server.yaml
+*.env
+!*.example
 
 # Backup files from upgrades
 *.bak
