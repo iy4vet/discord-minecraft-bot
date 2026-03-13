@@ -1,52 +1,119 @@
-This document is for v2.2. [Download here](https://github.com/MinecraftServerDiscordBot/minecraft-server-discord-bot-python/releases/tag/v2.2). 
+# Minecraft Server Discord Bot — v3.5
 
-# Overview
-Do you want a Discord Bot to start and manage your Minecraft server? This program will help you do just that! 
+A Discord bot that manages one or more Minecraft servers via slash commands, with two-way chat integration.
 
 ## Features
-This script can start your Minecraft server from a Discord command and will shut it down automatically when inactive! Users can get information about the server such as its address and online players. If the address changes, users can request a new address and the bot will get one automatically! It can also integrate your Discord and Minecraft servers' chats! <br /><br />
-For the server host, this program works entirely using vanilla methods, meaning you don't have to add any mods to your Minecraft server! 
+
+- **Multi-server support** — manage multiple Minecraft servers from a single bot instance.
+- **Automatic shutdown** — empty servers are stopped after a configurable grace period.
+- **Two-way chat** — Discord messages are relayed to Minecraft via RCON and Minecraft chat appears in Discord via webhooks. Each server gets its own thread.
+- **Proxy support** — optional BungeeCord / Velocity proxy management.
+- **Address checking** — the bot can ping your server and auto-detect address changes.
+- **Automatic migration** — upgrades from v1.0 `.env` configs all the way to v3.5 YAML.
+- **PyInstaller-ready** — pre-built binaries are available for Windows, macOS, and Linux (x64 and ARM64).
 
 ## Commands
-### There are 6 commands that can be used by anyone: 
-1. `/start` will start the Minecraft server if it's not already running. 
-2. `/stop` will shut down the Minecraft server if no players are online.  
-3. `/info` will give you the server information. 
-4. `/ipcheck` will check the server address given in `/info`. The bot will try to update the server address on its own if the address doesn't work. 
-5. `/say <message>` will send a message in the Minecraft server if it's running. The message will appear as `{username#0000} <message>`. **This command is still usable, but is discouraged in favour of a new and better feature.** 
-6. `/help` can be used to get information on these commands on Discord. 
-### These commands can be used only by the user(s) set in `server-op`: 
-1. `/cmd <command>` will execute a Minecraft command. For example, `/cmd time set 0`. The bot will respond with the output, in this case `Rcon: Set the time to 0`. 
-2. `/ipset <address> <port>` will take a new server address and check it. If it's valid, the bot will start using that address moving forward. Providing a new port is optional: the bot defaults to the current server port. This will be reset when the bot restarts. 
+
+### General
+
+| Command | Description |
+|---|---|
+| `/start <server> [delay]` | Start a Minecraft server. Optional `delay` (1–300s) postpones auto-shutdown; `-1` disables it. |
+| `/stop` | Stop all running servers (only if empty). |
+| `/delay <seconds> <server>` | Pause the auto-shutdown thread (1–300s, or `-1` to cancel). |
+| `/info` | Display address, proxy status, and online players for every server. |
+| `/checkaddress <server>` | Ping the stored address and auto-update if a new one is found. |
+| `/help` | Show command help. |
+
+### Operator only (users listed in `bot_op`)
+
+| Command | Description |
+|---|---|
+| `/setaddress <address> <port> <server>` | Set a new server address after verifying reachability. |
+| `/cmd <command> <server>` | Execute an arbitrary Minecraft command via RCON. |
+| `/reset` | Delete and regenerate the temporary server's world. |
 
 ## Installation
-Follow these steps: 
-### Setting up the Discord bot
-#### Do this part ONLY IF you are setting this up for the first time! v2.1 requires you to redo this section. 
-Go to [the Discord Developer site](https://discord.com/developers/), and create a new application. Now go to the "Bot" section and build a bot. <br />
-Head over to the "OAuth2" section, and under it, the "URL Generator" section. Under "Scopes", check `bot` and `applications.commands`. <br />
-Under "Bot Permissions", select the permission "Administrator". At the very bottom, there will be a "Generated URL". <br />
-Copy it and paste it in your browser. This will allow you to invite your bot to your server. <br />
 
-### Setting up the Minecraft server
-If you haven't already, set up your Minecraft server on your machine as normal. Now go to your `server.properties` file. <br />
-Change the following values: 
-- `enable-rcon=true` 
-- `rcon.password=<password>`, where \<password\> is the password you wish to use for Rcon.  
- 
-### Setting up the Bot variables
-Open the file named `bot.env`. 
-1. Paste your Discord bot token next to `bot-token`. 
-2. Paste the server address that other players would use to connect next to `server-address`. 
-3. Paste the server start script next to `start-script`. (For example, `start-script=java -Xmx2G -Xms512M -jar server.jar`)
-4. Paste the user ID of the account that shall be allowed to execute commands through Rcon next to `server-op`. If you want multiple users, separate each one with `,`. For example: `server-op=123,456,243,632`. Do not use spaces. 
-5. For `chat-channel-id`, refer to the [Discord server setup section](#setting-up-your-discord-server). 
+### 1. Create a Discord application
 
-### Setting up your Discord server
-Create a new channel for the Discord-Minecraft chat integration. <br />
- Copy its ID and paste it under `chat-channel-id`. <br />
- If you want multiple channels, simply separate each ID with `,`, similar to `server-op`. Do not use spaces. <br />
- 
-### Important notes
-- Minecraft connects to port 25565 by default. If you forward any port other than 25565, your address would look something like `xxx.xxx.xxx.xxx:port` since the port must also be specified for Minecraft. This CAN be set in `bot.env`, in which case the program pings the server on `port`. However, if you use port 25565, you may leave the address as `xxx.xxx.xxx.xxx` and the program will use port 25565 automatically. 
-- The Minecraft -> Discord integration works off the fact that messages sent by players show up as `<player> message` in the console. Therefore, any mods that change the chat format are very likely to break this feature. However, it is definitely worth trying such mods since there is a chance that some of them may work normally. 
+1. Go to the [Discord Developer Portal](https://discord.com/developers/) and create a new application.
+2. Under **Bot**, create a bot and copy the token.
+3. Under **OAuth2 → URL Generator**, select `bot` + `applications.commands`, then **Administrator** permission.
+4. Use the generated URL to invite the bot to your server.
+
+### 2. Set up your Minecraft server(s)
+
+Ensure each server's `server.properties` contains:
+
+```properties
+enable-rcon=true
+rcon.password=YOUR_PASSWORD
+server-ip=0.0.0.0
+server-port=25565
+rcon.port=25575
+```
+
+### 3. Configure the bot
+
+Copy `config_examples/config.yaml.example` to `bot.yaml` in the bot's directory and fill in your values. See the example for documentation of every field.
+
+**Minimal example:**
+
+```yaml
+version: v3.5
+bot_token: YOUR_TOKEN_HERE
+server_address: your.server.ip
+server_port: 25565
+server_title: My Minecraft Server
+bot_op:
+  - 123456789012345678
+discord:
+  "987654321098765432":
+    channels: {}
+minecraft:
+  MyServer:
+    start_script: java -Xmx2G -Xms512M -jar server.jar
+```
+
+### 4. Run the bot
+
+**From source (Python 3.10+):**
+
+```bash
+pip install -r requirements.txt
+python main.py
+```
+
+**From a pre-built binary:**
+
+Download the appropriate binary from [Releases](https://github.com/MinecraftServerDiscordBot/minecraft-server-discord-bot-python/releases) and run it in the same directory as your `bot.yaml` and server folders.
+
+## Upgrading from older versions
+
+The bot automatically migrates configurations from v1.0 (`.env`), v2.0/v2.4, and v3.0 to v3.5. A backup of the original file is created before any changes are made. Simply place the new `main.py` (or binary) alongside your existing config and run it.
+
+## Project structure
+
+```
+main.py               Entry point
+mcbot/
+  __init__.py          Package init
+  migration.py         Chained configuration migration (v1.0 → v3.5)
+config_examples/
+  config.yaml.example  v3.5 YAML configuration template
+  .env.example         Legacy v1.0 .env template
+.github/workflows/
+  build.yml            CI/CD: PyInstaller builds for 6 targets
+requirements.txt       Python dependencies
+```
+
+## Important notes
+
+- Minecraft chat relay parses `<player> message` from server stdout. Mods that alter the chat format may break this.
+- RCON must be enabled for all bot functionality.
+- The bot requires the **Message Content** intent (enabled in the Developer Portal and in code).
+
+## Licence
+
+[GNU GPL v3](LICENSE)
