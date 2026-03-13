@@ -1,0 +1,5 @@
+disnake>=2.9,<3
+jproperties>=2.1
+mcrcon>=0.7
+PyYAML>=6.0
+pyinstaller>=6.0
