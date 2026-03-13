@@ -1,0 +1,44 @@
+# Scratch / refactor workspace
+refactor/
+
+# Actual configuration files (contain secrets)
+bot.env
+bot.yaml
+server.yaml
+
+# Backup files from upgrades
+*.bak
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+*.egg
+dist/
+build/
+*.spec
+
+# Virtual environments
+.venv/
+.conda/
+venv/
+env/
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs (runtime-generated)
+logs/
+
+# PyInstaller
+*.manifest
+*.pem
