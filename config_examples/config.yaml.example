@@ -1,0 +1,61 @@
+# Minecraft Server Discord Bot — v3.5 Configuration
+# Copy this file to bot.yaml in the application root and fill in your values.
+# Lines beginning with '#' are comments and are ignored.
+
+# Bot authentication token from https://discord.com/developers/
+bot_token: "YOUR_DISCORD_BOT_TOKEN_HERE"
+
+# Discord user IDs with operator privileges (can use /cmd, /setaddress, /reset).
+bot_op:
+  - 123456789012345678
+  - 234567890123456789
+
+# Default external address for the Minecraft server(s).
+server_address: "192.168.1.100"
+
+# Default external port (used when no per-server override is set).
+server_port: 25565
+
+# Title shown in Discord embed messages.
+server_title: "My Minecraft Server"
+
+# Maximum number of servers that may run concurrently (-1 for unlimited).
+server_max_concurrent: -1
+
+# URL for the Minecraft player avatar used in webhook messages.
+mc_url: "https://example.com/avatar.png"
+
+# Enable cross-channel messaging (messages sent to the parent channel
+# are relayed to all server threads).
+crosstalk: false
+
+# Discord channel configuration.
+# Each top-level key is a Discord text channel ID.
+# "channels" maps server names to their dedicated thread IDs.
+# Thread IDs are populated automatically on first run if set to null.
+discord:
+  "987654321098765432":
+    channels:
+      Survival: null
+      Creative: null
+
+# Minecraft server definitions.
+# Each key is both the server name and the subdirectory containing its files.
+# Ensure each directory has a valid server.properties with RCON enabled.
+minecraft:
+  Survival:
+    start_script: "java -jar -Xmx4G spigot.jar"
+    proxy: false
+    server_port: 25565
+  Creative:
+    start_script: "java -jar -Xmx2G spigot.jar"
+    proxy: false
+    server_port: 25566
+
+# Proxy (BungeeCord / Velocity) configuration.
+proxy:
+  enabled: false
+  start_script: "java -jar bungeecord.jar"
+
+# Configuration version — do not change manually.
+version: "v3.5"
